@@ -1,0 +1,125 @@
+function flatten_dict(d, parent_key='', sep='.') {
+    let table = [{}];
+    for (let [k, v] of Object.entries(d)) {
+        let new_key = (parent_key ? parent_key + sep + k : k);
+        if (typeof v === 'object' && !Array.isArray(v)) {
+            for (let items of table) {
+                let res = flatten_dict(v, new_key, sep);
+                for (let d of res) {
+                    Object.assign(items, d);
+                }
+            }
+        } else if (Array.isArray(v)) {
+            let tmp_table = [];
+            for (let i = 0; i < table.length; i++) {
+                for (let j = 0; j < v.length; j++) {
+                    tmp_table.push(Object.assign({}, table[i]));
+                }
+            }
+            table = tmp_table;
+            for (let i = 0; i < table.length; i++) {
+                let res = flatten_dict(v[i], new_key, sep);
+                for (let d of res) {
+                    Object.assign(table[i], d);
+                }
+            }
+        } else {
+            for (let items of table) {
+                items[new_key] = v;
+            }
+        }
+    }
+    return table;
+}
+
+
+temp = {
+    'a':1,
+    'b':2,
+    'c': {
+        'aa':1,
+        'bb':2,
+        'cc': [
+            {
+                'aa':1,
+                'bb':2,
+                'cc':3
+            }
+        ]
+    },
+    'd': [
+        {
+            'aa':1,
+            'bb':2,
+            'cc':3
+        },
+        {
+            'aa':4,
+            'bb':5,
+            'cc':6
+        }
+    ]
+}
+
+let estructura = flatten_dict(temp);
+console.log(estructura);
+
+
+-------------------------------------------------------------------------------------------------------------
+
+
+def flatten_dict(d, parent_key='', sep='.'):
+    
+    table = [{}]
+    for k, v in d.items():
+        new_key = f"{parent_key}{sep}{k}" if parent_key else k
+        if isinstance(v, dict):
+            for items in table:
+                res = flatten_dict(v, new_key, sep=sep)
+                for d in res:
+                    items.update(d)
+        elif isinstance(v, list):
+            tmp_table = []
+            for i in range(0,len(table)):
+                for j in range(0,len(v)):
+                    tmp_table.append(table[i].copy())
+            table = tmp_table
+            for i in range(0,len(table)):
+                res = flatten_dict(v[i], new_key, sep=sep)
+                for d in res:
+                    table[i].update(d)
+        else:
+            for items in table:
+                items.update({new_key: v})
+    return table
+
+temp = {
+    'a':1,
+    'b':2,
+    'c': {
+        'aa':1,
+        'bb':2,
+        'cc': [
+            {
+                'aa':1,
+                'bb':2,
+                'cc':3
+            }
+        ]
+    },
+    'd': [
+        {
+            'aa':1,
+            'bb':2,
+            'cc':3
+        },
+        {
+            'aa':4,
+            'bb':5,
+            'cc':6
+        }
+    ]
+}
+
+estructura = flatten_dict(temp)
+print(estructura)
